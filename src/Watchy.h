@@ -19,10 +19,27 @@ typedef struct weatherData{
     int16_t weatherConditionCode;
 }weatherData;
 
+typedef GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> DisplayType;
+
+class Watchy;
+
+class Menu {
+    private:
+        DisplayType& display;
+        void showMenuUnderlying(bool partialRefresh, bool fast);
+    public:
+        Menu(DisplayType& display);
+        void moveMenuUp();
+        void moveMenuDown();
+        void showMenu(bool partialRefresh);
+        void showFastMenu();
+        void showActiveMenuItem(Watchy& watchy);
+};
+
 class Watchy {
     public:
         static DS3232RTC RTC;
-        static GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> display;
+        static DisplayType display;
         tmElements_t currentTime;
     public:
         Watchy();
@@ -32,8 +49,6 @@ class Watchy {
         void vibMotor(uint8_t intervalMs = 100, uint8_t length = 20);
 
         void handleButtonPress();
-        void showMenu(byte menuIndex, bool partialRefresh);
-        void showFastMenu(byte menuIndex);
         void showBattery();
         void showBuzz();
         void showAccelerometer();
@@ -53,6 +68,7 @@ class Watchy {
         static void _configModeCallback(WiFiManager *myWiFiManager);
         static uint16_t _readRegister(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
         static uint16_t _writeRegister(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
+        Menu menu;
 };
 
 extern RTC_DATA_ATTR int guiState;
